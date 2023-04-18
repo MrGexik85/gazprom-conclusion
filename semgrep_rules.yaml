@@ -208,3 +208,24 @@ rules:
   - patterns:
     - pattern-either:
       - pattern-inside: file_get_contents($FILENAME, ...)
+
+- id: xss-php-ealier-8.1-htmlspecialchars-single-quot
+  severity: WARNING
+  message: >-
+    When using htmlspecialchars in PHP versions below 8.1, there is a vulnerability 
+    involving single quotes. An attacker can write ' in user input and exploit cross-site scripting vulnerability.
+    Use ENT_QUOTES flag.
+  metadata:
+    techology: 
+    - php
+    category: security
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+  languages: [generic]
+  paths:
+    include:
+    - '*.php'
+  patterns: 
+  - pattern-inside: $ATTR = '...';
+  - pattern: echo htmlspecialchars($_GET[...])
