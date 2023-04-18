@@ -229,3 +229,16 @@ rules:
   patterns: 
   - pattern-inside: $ATTR = '...';
   - pattern: echo htmlspecialchars($_GET[...])
+
+- id: cookie-broken-auth
+  severity: ERROR
+  message: >-
+    Don't use constant values for check user's privilegies
+  metadata:
+    technology:
+    - go
+    category: security
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+  languages: [go]
