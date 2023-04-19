@@ -1,17 +1,16 @@
 rules:
 - id: insecure-use-gets-fn
-  pattern: gets(...)
+  severity: WARNING
   message: >-
     Avoid using 'gets()'. This function, when used improperly, does not consider
     buffer boundaries and can lead to buffer overflows. Use 'fgets()' instead
     for reading input.
-  languages: [c]
-  severity: WARNING
   metadata:
     category: security
     technology:
     - c
-    impact: HIGH
+  languages: [c]
+  pattern: gets(...)
 
 - id: extract-html-to-javascript
   mode: extract
@@ -35,34 +34,30 @@ rules:
       - "*.php"
 
 - id: postmessage-origin-validation
+  severity: WARNING
   message: >-
     No validation of origin is done by the addEventListener API. It may be possible to exploit this flaw
     to perform Cross Origin attacks such as Cross-Site Scripting(XSS).
-  pattern: window.addEventListener('message', $FUNC, ...)
-  languages: [javascript]
   metadata:
     category: security
     technology:
     - browser
-    subcategory:
-    - audit
-    likelihood: LOW
-    impact: LOW
-    confidence: LOW
-  severity: WARNING
+  languages: [javascript]
+  pattern: window.addEventListener('message', $FUNC, ...)
 
 - id: cors-misconfiguration
+  severity: WARNING
+  mode: taint
   message: >-
     By letting user input control CORS parameters, there is a risk that software does not properly verify
     that the source of data. Use literal values for CORS settings.
-  mode: taint
+  metadata:
+    technology:
+    - nodejs
+    category: security
   languages:
   - javascript
   - typescript
-  metadata:
-    category: security
-    impact: MEDIUM
-  severity: WARNING
   pattern-sources:
   - patterns:
     - pattern-either:
@@ -79,6 +74,8 @@ rules:
         regex: .*(Access-Control-Allow-Origin|access-control-allow-origin).* 
 
 - id: js-open-redirect
+  severity: WARNING
+  mode: taint 
   message: >-
     The application accepts potentially user-controlled input which
     can control the location of the current window context. This can lead two
@@ -86,18 +83,12 @@ rules:
     (XSS) with JavaScript URIs. It is recommended to validate
     user-controllable input before allowing it to control the redirection.
   metadata:
-    interfile: true
     category: security
-    confidence: HIGH
     technology:
     - browser
-    likelihood: HIGH
-    impact: MEDIUM
   languages:
   - javascript
   - typescript
-  severity: WARNING
-  mode: taint
   pattern-sources:
   - patterns:
     - pattern-either:
@@ -119,6 +110,7 @@ rules:
         metavariable: $SINK
 
 - id: flask-template-string
+  severity: ERROR
   message: >-
     Found a template created with string formatting.
     This is susceptible to server-side template injection
@@ -127,11 +119,7 @@ rules:
     category: security
     technology:
     - flask
-    likelihood: LOW
-    impact: MEDIUM
-    confidence: LOW
   languages: [python]
-  severity: ERROR
   pattern-either:
   - pattern: |
       $V = "..." % $S
@@ -139,8 +127,6 @@ rules:
       return flask.render_template_string($V, ...)
 
 - id: path-traversal-open
-  languages:
-  - python
   severity: ERROR
   message: >-
     Found request data in a call to 'open'. Ensure the request data is validated or sanitized, otherwise
@@ -150,11 +136,8 @@ rules:
     category: security
     technology:
     - flask
-    subcategory:
-    - audit
-    likelihood: MEDIUM
-    impact: HIGH
-    confidence: MEDIUM
+  languages:
+  - python
   pattern-either:
   - patterns:
     - pattern-inside: |
@@ -164,8 +147,6 @@ rules:
     - pattern: open(...)
 
 - id: path-traversal-command-injection-save
-  languages:
-  - python
   severity: ERROR
   message: >-
     Found request data in a call to 'save'. Ensure the request data is validated or sanitized, otherwise
@@ -174,11 +155,8 @@ rules:
     category: security
     technology:
     - flask
-    subcategory:
-    - audit
-    likelihood: MEDIUM
-    impact: HIGH
-    confidence: MEDIUM
+  languages:
+  - python
   pattern-either:
   - patterns:
     - pattern-inside: |
@@ -195,9 +173,6 @@ rules:
     technology:
     - php
     category: security
-    impact: MEDIUM
-    likelihood: MEDIUM
-    confidence: MEDIUM
   languages: [php]
   mode: taint
   pattern-sources:
@@ -219,9 +194,6 @@ rules:
     techology: 
     - php
     category: security
-    impact: MEDIUM
-    likelihood: MEDIUM
-    confidence: MEDIUM
   languages: [generic]
   paths:
     include:
@@ -231,14 +203,54 @@ rules:
   - pattern: echo htmlspecialchars($_GET[...])
 
 - id: cookie-broken-auth
-  severity: ERROR
+  severity: WARNING
   message: >-
-    Don't use constant values for check user's privilegies
+    Don't use user input to compare with constant values for check user's privilegies
   metadata:
     technology:
     - go
     category: security
-    likelihood: HIGH
-    impact: MEDIUM
-    confidence: HIGH
   languages: [go]
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        $X, ... = $REQ.Cookie("...")
+        ...
+        <... $FUNC($X.Value) == "..." ...>
+    - pattern: $FUNC($X.Value) == "..."
+
+- id: django-orm-select-sql-injection
+  severity: WARNING
+  message: >-
+    Ensure the user input is validated or sanitized, otherwise
+    it could result in sql injection.
+  metadata:
+    technology:
+    - django
+    category: security
+  languages: [python]
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        $X = $REQ.GET.get("...", ...)
+        ...
+        $CLASS.objects.annotate($PARAM = <... $X ...>, ...)
+    - pattern: $CLASS.objects.annotate($PARAM = <... $X ...>, ...)
+
+- id: django-orm-insert-sql-injection
+  severity: WARNING
+  message: >-
+    Ensure the user input is validated or sanitized, otherwise
+    it could result in sql injection.
+  metadata:
+    technology:
+    - django
+    category: security
+  languages: [python]
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        $X = $REQ.META.get("...", ...)
+        ...
+        $CLASS.objects.create($PARAM = <... $X ...>, ...)
+    - pattern: $CLASS.objects.create($PARAM = <... $X ...>, ...)
