@@ -1,0 +1,968 @@
+{
+    "errors": [],
+    "paths": {
+      "_comment": "<add --verbose for a list of skipped paths>",
+      "scanned": [
+        "1.1/customlog.py",
+        "1.1/main.py",
+        "1.2/index.php",
+        "1.3/index.php",
+        "1.4/main.go",
+        "1.5/main.c",
+        "1.6/index.js",
+        "1.7/index.php",
+        "1.8/index.php",
+        "1.9/main.py",
+        "2/web/app.py",
+        "2/web/vuln/__init__.py",
+        "2/web/vuln/apps.py",
+        "2/web/vuln/migrations/0001_initial.py",
+        "2/web/vuln/migrations/__init__.py",
+        "2/web/vuln/models.py",
+        "2/web/vuln/urls.py",
+        "2/web/vuln/views.py",
+        "exploits/1.1/exploit.py",
+        "exploits/1.1/exploit2.py",
+        "exploits/1.2/exploit.php",
+        "exploits/1.3/exploit.php",
+        "exploits/1.4/exploit.py",
+        "exploits/1.6/exploit.php",
+        "exploits/1.7/exploit.py",
+        "exploits/1.9/exploit.py"
+      ]
+    },
+    "results": [
+      {
+        "check_id": "insecure-use-gets-fn",
+        "end": {
+          "col": 21,
+          "line": 21,
+          "offset": 347
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "437d8632dd0188413079a7bd46d6f9c3287d3db06e4edde733f30d3906ce89ae65298297e27c595e35cecf246be54a65dfc9b5f2dc216f1cef3efa5e4015738f_0",
+          "is_ignored": false,
+          "lines": "        gets(tryOTP);",
+          "message": "Avoid using 'gets()'. This function, when used improperly, does not consider buffer boundaries and can lead to buffer overflows. Use 'fgets()' instead for reading input.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "c"
+            ]
+          },
+          "metavars": {},
+          "severity": "WARNING"
+        },
+        "path": "1.5/main.c",
+        "start": {
+          "col": 9,
+          "line": 21,
+          "offset": 335
+        }
+      },
+      {
+        "check_id": "postmessage-origin-validation",
+        "end": {
+          "col": 5,
+          "line": 22,
+          "offset": 648
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "0707347692bed97ec8fb982291d9f9ad4ef14ea9d0bf934d944e30c5e53fed178485ad908ad0460dd387a7343cbea0a6525dcc7c1f3cabf80e6267a923a74704_0",
+          "is_ignored": false,
+          "lines": "  window.addEventListener(\"message\", (event)=>{\n    console.log(\"[OK] Connected!\")\n    address = event.data\n    document.getElementById('out').innerHTML += `<u>${address}</u>`\n  });",
+          "message": "No validation of origin is done by the addEventListener API. It may be possible to exploit this flaw to perform Cross Origin attacks such as Cross-Site Scripting(XSS).",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "browser"
+            ]
+          },
+          "metavars": {
+            "$FUNC": {
+              "abstract_content": "event=>{console.log(\"[OK] Connected!\")address=event.data document document..getElementById getElementById(('out''out'))..innerHTML innerHTML+=+=`<u>address</u>}",
+              "end": {
+                "col": 4,
+                "line": 8,
+                "offset": 275
+              },
+              "start": {
+                "col": 39,
+                "line": 4,
+                "offset": 134
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "1.3/index.php",
+        "start": {
+          "col": 3,
+          "line": 18,
+          "offset": 470
+        }
+      },
+      {
+        "check_id": "cors-misconfiguration",
+        "end": {
+          "col": 46,
+          "line": 23,
+          "offset": 523
+        },
+        "extra": {
+          "dataflow_trace": {
+            "taint_sink": [
+              "CliLoc",
+              [
+                {
+                  "end": {
+                    "col": 46,
+                    "line": 23,
+                    "offset": 523
+                  },
+                  "path": "1.6/index.js",
+                  "start": {
+                    "col": 40,
+                    "line": 23,
+                    "offset": 517
+                  }
+                },
+                "origin"
+              ]
+            ],
+            "taint_source": [
+              "CliLoc",
+              [
+                {
+                  "end": {
+                    "col": 2,
+                    "line": 41,
+                    "offset": 976
+                  },
+                  "path": "1.6/index.js",
+                  "start": {
+                    "col": 25,
+                    "line": 15,
+                    "offset": 317
+                  }
+                },
+                "function (req, res) {\n\n    origin = req.headers[\"origin\"];\n    if ( origin == undefined || origin == \"\" ) {\n        origin = \"*\";\n    }\n  \n    const headers = {\n        \"Access-Control-Allow-Origin\": origin,\n        \"Access-Control-Allow-Credentials\": \"true\",\n        \"Content-Type\": \"application/json\",\n    };\n    res.writeHead(200, headers);\n\n    console.log(`[${Date()}][LOG]`, req.headers[\"referer\"], \"=>\", req.headers[\"host\"]);\n\n    sess = GetCredentials(req.session)\n\n    userCred = {\n        \"id\": sess.id,\n        \"username\": sess.username,\n        \"email\": sess.email,\n        \"session\": sess.session,\n    };\n\n    res.end(JSON.stringify(userCred));\n}"
+              ]
+            ]
+          },
+          "engine_kind": "OSS",
+          "fingerprint": "de0e509abf3461e9d72697c02e85b0d4974dc81f1b089000587cc8a5b1d15997d1cd975c2602fe81bfadc6e159e6fce8a90ab80a7dd728af672ff15f3dd39c91_0",
+          "is_ignored": false,
+          "lines": "        \"Access-Control-Allow-Origin\": origin,",
+          "message": "By letting user input control CORS parameters, there is a risk that software does not properly verify that the source of data. Use literal values for CORS settings.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "nodejs"
+            ]
+          },
+          "metavars": {
+            "$HEADER": {
+              "abstract_content": "\"Access-Control-Allow-Origin\"",
+              "end": {
+                "col": 38,
+                "line": 23,
+                "offset": 515
+              },
+              "start": {
+                "col": 9,
+                "line": 23,
+                "offset": 486
+              }
+            },
+            "$HEADS": {
+              "abstract_content": "headers",
+              "end": {
+                "col": 18,
+                "line": 22,
+                "offset": 473
+              },
+              "start": {
+                "col": 11,
+                "line": 22,
+                "offset": 466
+              }
+            },
+            "$REQ": {
+              "abstract_content": "req",
+              "end": {
+                "col": 38,
+                "line": 15,
+                "offset": 330
+              },
+              "start": {
+                "col": 35,
+                "line": 15,
+                "offset": 327
+              }
+            },
+            "$RES": {
+              "abstract_content": "res",
+              "end": {
+                "col": 43,
+                "line": 15,
+                "offset": 335
+              },
+              "start": {
+                "col": 40,
+                "line": 15,
+                "offset": 332
+              }
+            },
+            "$VAR": {
+              "abstract_content": "origin",
+              "end": {
+                "col": 46,
+                "line": 23,
+                "offset": 523
+              },
+              "start": {
+                "col": 40,
+                "line": 23,
+                "offset": 517
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "1.6/index.js",
+        "start": {
+          "col": 40,
+          "line": 23,
+          "offset": 517
+        }
+      },
+      {
+        "check_id": "js-open-redirect",
+        "end": {
+          "col": 32,
+          "line": 16,
+          "offset": 375
+        },
+        "extra": {
+          "dataflow_trace": {
+            "intermediate_vars": [
+              {
+                "content": "path",
+                "location": {
+                  "end": {
+                    "col": 13,
+                    "line": 13,
+                    "offset": 290
+                  },
+                  "path": "1.8/index.php",
+                  "start": {
+                    "col": 9,
+                    "line": 13,
+                    "offset": 286
+                  }
+                }
+              }
+            ],
+            "taint_sink": [
+              "CliLoc",
+              [
+                {
+                  "end": {
+                    "col": 32,
+                    "line": 16,
+                    "offset": 375
+                  },
+                  "path": "1.8/index.php",
+                  "start": {
+                    "col": 20,
+                    "line": 16,
+                    "offset": 363
+                  }
+                },
+                "filter(path)"
+              ]
+            ],
+            "taint_source": [
+              "CliLoc",
+              [
+                {
+                  "end": {
+                    "col": 34,
+                    "line": 13,
+                    "offset": 311
+                  },
+                  "path": "1.8/index.php",
+                  "start": {
+                    "col": 16,
+                    "line": 13,
+                    "offset": 293
+                  }
+                },
+                "urlParams.get('r')"
+              ]
+            ]
+          },
+          "engine_kind": "OSS",
+          "fingerprint": "d562d441651d10d0cfabb747277b6d62d4a0d30fc48940b09aca6f19356363338e0541e0cef88174f74cbb7a8020bc5c2794090a86c0b06c8ed3e76dfe69f93f_0",
+          "is_ignored": false,
+          "lines": "        location = filter(path);",
+          "message": "The application accepts potentially user-controlled input which can control the location of the current window context. This can lead two types of vulnerabilities open-redirection and Cross-Site-Scripting (XSS) with JavaScript URIs. It is recommended to validate user-controllable input before allowing it to control the redirection.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "browser"
+            ]
+          },
+          "metavars": {
+            "$PROPS": {
+              "abstract_content": "urlParams",
+              "end": {
+                "col": 25,
+                "line": 7,
+                "offset": 164
+              },
+              "propagated_value": {
+                "svalue_abstract_content": "new URLSearchParams(window.location.search)",
+                "svalue_end": {
+                  "col": 64,
+                  "line": 6,
+                  "offset": 138
+                },
+                "svalue_start": {
+                  "col": 21,
+                  "line": 6,
+                  "offset": 95
+                }
+              },
+              "start": {
+                "col": 16,
+                "line": 7,
+                "offset": 155
+              }
+            },
+            "$SINK": {
+              "abstract_content": "filter(path)",
+              "end": {
+                "col": 32,
+                "line": 10,
+                "offset": 237
+              },
+              "start": {
+                "col": 20,
+                "line": 10,
+                "offset": 225
+              }
+            },
+            "$WINDOW": {
+              "abstract_content": "window",
+              "end": {
+                "col": 47,
+                "line": 6,
+                "offset": 121
+              },
+              "start": {
+                "col": 41,
+                "line": 6,
+                "offset": 115
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "1.8/index.php",
+        "start": {
+          "col": 20,
+          "line": 16,
+          "offset": 363
+        }
+      },
+      {
+        "check_id": "flask-template-string",
+        "end": {
+          "col": 64,
+          "line": 26,
+          "offset": 557
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "ab12f9418561e016a002a98112ac2677469b79b44024583923068e3f6cc53a58665c02d20ff00baa5195f5c63e743a623e97208d7d10dea0b08dbf705bbf099e_0",
+          "is_ignored": false,
+          "lines": "    tpl = ('''\n    <html>\n    <head>\n     <link rel=\"stylesheet\" href=\"{{ domain }}/styles.css\">\n    </head>\n    <body>\n    <script src=\"{{ domain }}/main.js\"></script>\n    <h3 id=\"search\">No result for: %s</h3>\n     </body>\n    </html>\n    ''' % s)\n\n    return render_template_string(tpl, domain=request.url_root)",
+          "message": "Found a template created with string formatting. This is susceptible to server-side template injection and cross-site scripting attacks.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "flask"
+            ]
+          },
+          "metavars": {
+            "$S": {
+              "abstract_content": "s",
+              "end": {
+                "col": 12,
+                "line": 24,
+                "offset": 491
+              },
+              "start": {
+                "col": 11,
+                "line": 24,
+                "offset": 490
+              }
+            },
+            "$V": {
+              "abstract_content": "tpl",
+              "end": {
+                "col": 8,
+                "line": 14,
+                "offset": 250
+              },
+              "start": {
+                "col": 5,
+                "line": 14,
+                "offset": 247
+              }
+            }
+          },
+          "severity": "ERROR"
+        },
+        "path": "1.9/main.py",
+        "start": {
+          "col": 5,
+          "line": 14,
+          "offset": 247
+        }
+      },
+      {
+        "check_id": "path-traversal-open",
+        "end": {
+          "col": 60,
+          "line": 24,
+          "offset": 638
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "54197288a1ce89a8376e76b8c83bd839210b45eb8ba4447370a390032be0991f97a1db0e763f052bc67c4703dd58e1c3ed86dbb97f125c14c0afc11f8bdef0f9_0",
+          "is_ignored": false,
+          "lines": "    file = open(app.config['UPLOAD_FOLDER'] + getFile, \"r\")",
+          "message": "Found request data in a call to 'open'. Ensure the request data is validated or sanitized, otherwise it could result in path traversal attacks.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "flask"
+            ]
+          },
+          "metavars": {
+            "$INTERM": {
+              "abstract_content": "getFile",
+              "end": {
+                "col": 12,
+                "line": 23,
+                "offset": 513
+              },
+              "start": {
+                "col": 5,
+                "line": 23,
+                "offset": 506
+              }
+            },
+            "$W": {
+              "abstract_content": "args",
+              "end": {
+                "col": 27,
+                "line": 23,
+                "offset": 528
+              },
+              "start": {
+                "col": 23,
+                "line": 23,
+                "offset": 524
+              }
+            }
+          },
+          "severity": "ERROR"
+        },
+        "path": "1.1/main.py",
+        "start": {
+          "col": 12,
+          "line": 24,
+          "offset": 590
+        }
+      },
+      {
+        "check_id": "path-traversal-command-injection-save",
+        "end": {
+          "col": 57,
+          "line": 35,
+          "offset": 866
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "3a0ed4c4204079b3376715060aff92f13c7a3f45ae8c774d12a66712080dc5f86c340e5ea90245048be34766e14303b18f6269dedf68d2a443f6c92496336ab6_0",
+          "is_ignored": false,
+          "lines": "        f.save(app.config[\"UPLOAD_FOLDER\"] + f.filename)",
+          "message": "Found request data in a call to 'save'. Ensure the request data is validated or sanitized, otherwise it could result in path traversal or command injection attacks.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "flask"
+            ]
+          },
+          "metavars": {
+            "$FILE": {
+              "abstract_content": "f",
+              "end": {
+                "col": 10,
+                "line": 35,
+                "offset": 819
+              },
+              "propagated_value": {
+                "svalue_abstract_content": "request.files['file']",
+                "svalue_end": {
+                  "col": 34,
+                  "line": 34,
+                  "offset": 809
+                },
+                "svalue_start": {
+                  "col": 13,
+                  "line": 34,
+                  "offset": 788
+                }
+              },
+              "start": {
+                "col": 9,
+                "line": 35,
+                "offset": 818
+              }
+            },
+            "$W": {
+              "abstract_content": "files",
+              "end": {
+                "col": 26,
+                "line": 34,
+                "offset": 801
+              },
+              "start": {
+                "col": 21,
+                "line": 34,
+                "offset": 796
+              }
+            }
+          },
+          "severity": "ERROR"
+        },
+        "path": "1.1/main.py",
+        "start": {
+          "col": 9,
+          "line": 35,
+          "offset": 818
+        }
+      },
+      {
+        "check_id": "read-file-by-user-input-filename",
+        "end": {
+          "col": 38,
+          "line": 22,
+          "offset": 399
+        },
+        "extra": {
+          "dataflow_trace": {
+            "intermediate_vars": [
+              {
+                "content": "$file",
+                "location": {
+                  "end": {
+                    "col": 10,
+                    "line": 15,
+                    "offset": 271
+                  },
+                  "path": "1.7/index.php",
+                  "start": {
+                    "col": 5,
+                    "line": 15,
+                    "offset": 266
+                  }
+                }
+              }
+            ],
+            "taint_sink": [
+              "CliLoc",
+              [
+                {
+                  "end": {
+                    "col": 38,
+                    "line": 22,
+                    "offset": 399
+                  },
+                  "path": "1.7/index.php",
+                  "start": {
+                    "col": 12,
+                    "line": 22,
+                    "offset": 373
+                  }
+                },
+                "file_get_contents( $file )"
+              ]
+            ],
+            "taint_source": [
+              "CliLoc",
+              [
+                {
+                  "end": {
+                    "col": 48,
+                    "line": 15,
+                    "offset": 309
+                  },
+                  "path": "1.7/index.php",
+                  "start": {
+                    "col": 43,
+                    "line": 15,
+                    "offset": 304
+                  }
+                },
+                "$_GET"
+              ]
+            ]
+          },
+          "engine_kind": "OSS",
+          "fingerprint": "a596b6dce0ce938de6200a6139adc4257d63483161d401ddcc23564f75ac5a2ebb48cbd9db0b72800d1ead9e6a96172ad4b620c595420da9cec28d648a8fa5ce_0",
+          "is_ignored": false,
+          "lines": "$content = file_get_contents( $file );",
+          "message": "File name based on user input risks server-side request forgery.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "php"
+            ]
+          },
+          "metavars": {
+            "$FILENAME": {
+              "abstract_content": "$file",
+              "end": {
+                "col": 36,
+                "line": 22,
+                "offset": 397
+              },
+              "start": {
+                "col": 31,
+                "line": 22,
+                "offset": 392
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "1.7/index.php",
+        "start": {
+          "col": 12,
+          "line": 22,
+          "offset": 373
+        }
+      },
+      {
+        "check_id": "xss-php-ealier-8.1-htmlspecialchars-single-quot",
+        "end": {
+          "col": 57,
+          "line": 18,
+          "offset": 443
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "42d9120c8dd5df115b9d442a6ec1106abc25466ac7569d0e64c3c9ce77c27c99b44cfa9059b690323c65fcbecab116b73d322b674e7d45da0cf9e16fb8a47646_0",
+          "is_ignored": false,
+          "lines": "    email = '<?php echo htmlspecialchars($_GET['email']);?>';",
+          "message": "When using htmlspecialchars in PHP versions below 8.1, there is a vulnerability  involving single quotes. An attacker can write ' in user input and exploit cross-site scripting vulnerability. Use ENT_QUOTES flag.",
+          "metadata": {
+            "category": "security",
+            "techology": [
+              "php"
+            ]
+          },
+          "metavars": {
+            "$ATTR": {
+              "abstract_content": "email",
+              "end": {
+                "col": 10,
+                "line": 18,
+                "offset": 396
+              },
+              "start": {
+                "col": 5,
+                "line": 18,
+                "offset": 391
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "1.2/index.php",
+        "start": {
+          "col": 20,
+          "line": 18,
+          "offset": 406
+        }
+      },
+      {
+        "check_id": "cookie-broken-auth",
+        "end": {
+          "col": 47,
+          "line": 27,
+          "offset": 434
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "0f5c51d012b020e5b0ed4b2bec22f83b20a96fbea021fae4134851c8399d00504b4cdb5e605910a295a752ff6d06ce5536b20b4344db4c1728c666153d2f79ed_0",
+          "is_ignored": false,
+          "lines": "\t\t\tif strings.ToLower(h.Role.Value) == \"admin\" {",
+          "message": "Don't use user input to compare with constant values for check user's privilegies",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "go"
+            ]
+          },
+          "metavars": {
+            "$FUNC": {
+              "abstract_content": "strings.ToLower",
+              "end": {
+                "col": 22,
+                "line": 27,
+                "offset": 409
+              },
+              "start": {
+                "col": 7,
+                "line": 27,
+                "offset": 394
+              }
+            },
+            "$REQ": {
+              "abstract_content": "r",
+              "end": {
+                "col": 17,
+                "line": 21,
+                "offset": 278
+              },
+              "start": {
+                "col": 16,
+                "line": 21,
+                "offset": 277
+              }
+            },
+            "$X": {
+              "abstract_content": "h.Role",
+              "end": {
+                "col": 29,
+                "line": 27,
+                "offset": 416
+              },
+              "start": {
+                "col": 23,
+                "line": 27,
+                "offset": 410
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "1.4/main.go",
+        "start": {
+          "col": 7,
+          "line": 27,
+          "offset": 394
+        }
+      },
+      {
+        "check_id": "django-orm-select-sql-injection",
+        "end": {
+          "col": 77,
+          "line": 22,
+          "offset": 578
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "521da35811a64c857478e912ec6296d3f017eab40f04e5f1f33e7236f56644682ad2fd07cde49be0155e0780c882c18254c2aa6798f8124624711505183bba57_0",
+          "is_ignored": false,
+          "lines": "    objects = list(WebLog.objects.annotate(time=Trunc('created_time', date)).values('time').order_by('-time').annotate(count=Count('id')))",
+          "message": "Ensure the user input is validated or sanitized, otherwise it could result in sql injection.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "django"
+            ]
+          },
+          "metavars": {
+            "$CLASS": {
+              "abstract_content": "WebLog",
+              "end": {
+                "col": 26,
+                "line": 22,
+                "offset": 527
+              },
+              "start": {
+                "col": 20,
+                "line": 22,
+                "offset": 521
+              }
+            },
+            "$PARAM": {
+              "abstract_content": "time",
+              "end": {
+                "col": 48,
+                "line": 22,
+                "offset": 549
+              },
+              "start": {
+                "col": 44,
+                "line": 22,
+                "offset": 545
+              }
+            },
+            "$REQ": {
+              "abstract_content": "request",
+              "end": {
+                "col": 19,
+                "line": 21,
+                "offset": 475
+              },
+              "start": {
+                "col": 12,
+                "line": 21,
+                "offset": 468
+              }
+            },
+            "$X": {
+              "abstract_content": "date",
+              "end": {
+                "col": 75,
+                "line": 22,
+                "offset": 576
+              },
+              "propagated_value": {
+                "svalue_abstract_content": "request.GET.get('date''minute')",
+                "svalue_end": {
+                  "col": 45,
+                  "line": 21,
+                  "offset": 501
+                },
+                "svalue_start": {
+                  "col": 12,
+                  "line": 21,
+                  "offset": 468
+                }
+              },
+              "start": {
+                "col": 71,
+                "line": 22,
+                "offset": 572
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "2/web/vuln/views.py",
+        "start": {
+          "col": 20,
+          "line": 22,
+          "offset": 521
+        }
+      },
+      {
+        "check_id": "django-orm-insert-sql-injection",
+        "end": {
+          "col": 6,
+          "line": 15,
+          "offset": 407
+        },
+        "extra": {
+          "engine_kind": "OSS",
+          "fingerprint": "9efe155c35577dcf84cc97f23d76a721484894bba4d8d52dd66c7f93f8b2cba06c9741e2378a79e771bab1833292c32961cad601253dd0223eb2597e88accfc3_0",
+          "is_ignored": false,
+          "lines": "    WebLog.objects.create(\n        method=method,\n        url=url,\n        user_agent=user_agent\n    )",
+          "message": "Ensure the user input is validated or sanitized, otherwise it could result in sql injection.",
+          "metadata": {
+            "category": "security",
+            "technology": [
+              "django"
+            ]
+          },
+          "metavars": {
+            "$CLASS": {
+              "abstract_content": "WebLog",
+              "end": {
+                "col": 11,
+                "line": 11,
+                "offset": 315
+              },
+              "start": {
+                "col": 5,
+                "line": 11,
+                "offset": 309
+              }
+            },
+            "$PARAM": {
+              "abstract_content": "user_agent",
+              "end": {
+                "col": 19,
+                "line": 14,
+                "offset": 390
+              },
+              "start": {
+                "col": 9,
+                "line": 14,
+                "offset": 380
+              }
+            },
+            "$REQ": {
+              "abstract_content": "request",
+              "end": {
+                "col": 25,
+                "line": 10,
+                "offset": 276
+              },
+              "start": {
+                "col": 18,
+                "line": 10,
+                "offset": 269
+              }
+            },
+            "$X": {
+              "abstract_content": "user_agent",
+              "end": {
+                "col": 30,
+                "line": 14,
+                "offset": 401
+              },
+              "propagated_value": {
+                "svalue_abstract_content": "request.META.get('HTTP_USER_AGENT')",
+                "svalue_end": {
+                  "col": 53,
+                  "line": 10,
+                  "offset": 304
+                },
+                "svalue_start": {
+                  "col": 18,
+                  "line": 10,
+                  "offset": 269
+                }
+              },
+              "start": {
+                "col": 20,
+                "line": 14,
+                "offset": 391
+              }
+            }
+          },
+          "severity": "WARNING"
+        },
+        "path": "2/web/vuln/views.py",
+        "start": {
+          "col": 5,
+          "line": 11,
+          "offset": 309
+        }
+      }
+    ],
+    "version": "1.18.0"
+  }

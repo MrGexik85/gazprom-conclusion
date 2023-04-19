@@ -1,0 +1,102 @@
+                    
+                    
+┌──────────────────┐
+│ 12 Code Findings │
+└──────────────────┘
+                               
+  [36m[22m[24m  1.1/main.py [0m
+       [1m[24mpath-traversal-command-injection-save[0m                                              
+          Found request data in a call to 'save'. Ensure the request data is validated or sanitized,
+          otherwise it could result in path traversal or command injection attacks.                 
+                                                                                                    
+           35┆ [1m[24mf.save(app.config["UPLOAD_FOLDER"] + f.filename)[0m
+            ⋮┆----------------------------------------
+       [1m[24mpath-traversal-open[0m                                                                
+          Found request data in a call to 'open'. Ensure the request data is validated or sanitized,
+          otherwise it could result in path traversal attacks.                                      
+                                                                                                    
+           24┆ file = [1m[24mopen(app.config['UPLOAD_FOLDER'] + getFile, "r")[0m
+                                 
+  [36m[22m[24m  1.2/index.php [0m
+       [1m[24mxss-php-ealier-8.1-htmlspecialchars-single-quot[0m                                    
+          When using htmlspecialchars in PHP versions below 8.1, there is a vulnerability  involving
+          single quotes. An attacker can write ' in user input and exploit cross-site scripting     
+          vulnerability. Use ENT_QUOTES flag.                                                       
+                                                                                                    
+           18┆ email = '<?php [1m[24mecho htmlspecialchars($_GET['email'])[0m;?>';
+                                 
+  [36m[22m[24m  1.3/index.php [0m
+       [1m[24mpostmessage-origin-validation[0m                                                      
+          No validation of origin is done by the addEventListener API. It may be possible to exploit
+          this flaw to perform Cross Origin attacks such as Cross-Site Scripting(XSS).              
+                                                                                                    
+           18┆ [1m[24mwindow.addEventListener("message", (event)=>{[0m
+           19┆ [1m[24m  console.log("[OK] Connected!")[0m
+           20┆ [1m[24m  address = event.data[0m
+           21┆ [1m[24m  document.getElementById('out').innerHTML += `<u>${address}</u>`[0m
+           22┆ [1m[24m})[0m;
+                               
+  [36m[22m[24m  1.4/main.go [0m
+       [1m[24mcookie-broken-auth[0m                                                        
+          Don't use user input to compare with constant values for check user's privilegies
+                                                                                           
+           27┆ if [1m[24mstrings.ToLower(h.Role.Value) == "admin"[0m {
+                              
+  [36m[22m[24m  1.5/main.c [0m
+       [1m[24minsecure-use-gets-fn[0m                                                          
+          Avoid using 'gets()'. This function, when used improperly, does not consider buffer  
+          boundaries and can lead to buffer overflows. Use 'fgets()' instead for reading input.
+                                                                                               
+           21┆ [1m[24mgets(tryOTP)[0m;
+                                
+  [36m[22m[24m  1.6/index.js [0m
+       [1m[24mcors-misconfiguration[0m                                                         
+          By letting user input control CORS parameters, there is a risk that software does not
+          properly verify that the source of data. Use literal values for CORS settings.       
+                                                                                               
+           23┆ "Access-Control-Allow-Origin": [1m[24morigin[0m,
+                                 
+  [36m[22m[24m  1.7/index.php [0m
+       [1m[24mread-file-by-user-input-filename[0m                         
+          File name based on user input risks server-side request forgery.
+                                                                          
+           22┆ $content = [1m[24mfile_get_contents( $file )[0m;
+                                 
+  [36m[22m[24m  1.8/index.php [0m
+       [1m[24mjs-open-redirect[0m                                                                    
+          The application accepts potentially user-controlled input which can control the location of
+          the current window context. This can lead two types of vulnerabilities open-redirection and
+          Cross-Site-Scripting (XSS) with JavaScript URIs. It is recommended to validate user-       
+          controllable input before allowing it to control the redirection.                          
+                                                                                                     
+           16┆ location = [1m[24mfilter(path)[0m;
+                               
+  [36m[22m[24m  1.9/main.py [0m
+       [1m[24mflask-template-string[0m                                                                
+          Found a template created with string formatting. This is susceptible to server-side template
+          injection and cross-site scripting attacks.                                                 
+                                                                                                      
+           14┆ [1m[24mtpl = ('''[0m
+           15┆ [1m[24m<html>[0m
+           16┆ [1m[24m<head>[0m
+           17┆ [1m[24m <link rel="stylesheet" href="{{ domain }}/styles.css">[0m
+           18┆ [1m[24m</head>[0m
+           19┆ [1m[24m<body>[0m
+           20┆ [1m[24m<script src="{{ domain }}/main.js"></script>[0m
+           21┆ [1m[24m<h3 id="search">No result for: %s</h3>[0m
+           22┆ [1m[24m </body>[0m
+           23┆ [1m[24m</html>[0m
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+                                       
+  [36m[22m[24m  2/web/vuln/views.py [0m
+       [1m[24mdjango-orm-insert-sql-injection[0m                                                      
+          Ensure the user input is validated or sanitized, otherwise it could result in sql injection.
+                                                                                                      
+           11┆ [1m[24mWebLog.objects.create([0m
+           12┆ [1m[24m    method=method,[0m
+           13┆ [1m[24m    url=url,[0m
+           14┆ [1m[24m    user_agent=user_agent[0m
+           15┆ [1m[24m)[0m
+            ⋮┆----------------------------------------
+           22┆ objects = list([1m[24mWebLog.objects.annotate(time=Trunc('created_time',                                 
+  date))[0m.values('time').order_by('-time').annotate(count=Count('id')))                                               
